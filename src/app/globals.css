@@ -1,6 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "../styles/tokens.css";
 
-@import '../styles/tokens.css';
-@import '../styles/base.css';
-@import '../styles/layout.css';
-@import '../styles/components.css';
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--sf);
+  --color-text: var(--ink);
+  --color-muted: var(--mu);
+  --color-border: var(--ln);
+  --color-primary: var(--pr);
+  --color-on-primary: var(--prt);
+  --color-accent: var(--ac);
+  --color-danger: var(--bad);
+  --color-success: var(--ok);
+  --color-soft: var(--soft);
+  --color-sidebar: var(--sb-bg);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+  --spacing-1: var(--sp-1);
+  --spacing-2: var(--sp-2);
+  --spacing-3: var(--sp-3);
+  --spacing-4: var(--sp-4);
+  --spacing-5: var(--sp-5);
+  --spacing-6: var(--sp-6);
+  --spacing-7: var(--sp-7);
+  --spacing-8: var(--sp-8);
+  --spacing-9: var(--sp-9);
+  --spacing-10: var(--sp-10);
+  --spacing-11: var(--sp-11);
+  --spacing-12: var(--sp-12);
+  --spacing-13: var(--sp-13);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-full: var(--r-pill);
+  --text-xs: var(--fs-xs);
+  --text-sm: var(--fs-sm);
+  --text-lg: var(--fs-panel);
+  --text-2xl: var(--fs-h1);
+  --text-3xl: var(--fs-h1);
+  --text-xs--line-height: var(--lh-base);
+  --text-sm--line-height: var(--lh-base);
+  --text-lg--line-height: var(--lh-tight);
+  --text-2xl--line-height: var(--lh-tight);
+  --text-3xl--line-height: var(--lh-tight);
+}
+@source "../**/*.{js,jsx,ts,tsx}";
+
+@layer base {
+* { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px); background: var(--bg); color: var(--ink); font: var(--fs-body)/var(--lh-base) var(--font-body); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--pr); outline-offset: 2px; }
+}
+dialog::backdrop { background: var(--color-overlay); }

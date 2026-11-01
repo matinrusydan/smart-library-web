@@ -4,7 +4,7 @@
 Target visual reference: Figma file `Smart-Library` (`kNDLPmgGdLgo3AKQn8FEyk`), page `Version 2` (`153:54`). Phase 0 tokens were transcribed from `Smart-Library-Figma/smart-library/assets/tokens.css`; local CSS documents layout and component conventions. These files are not proof of live Figma parity. Exact 1:1 verification remains an explicit gate.
 
 ## Token architecture
-`src/styles/tokens.css` is the central source for semantic colors, typography, spacing, radii, layout, sidebar, icon sizes, and shadows. Theme switching changes semantic values using `data-theme`; consumers should reference tokens rather than embed repeated values. The black overlay token remains constant across themes.
+`src/styles/tokens.css` is the central source for semantic colors, typography, spacing, radii, layout, sidebar, icon sizes, and shadows. Tailwind CSS v4 utilities are mapped to semantic variables via `@theme inline` in `src/app/globals.css`. Theme switching changes semantic values using `data-theme`; consumers should reference token-backed utilities rather than embed repeated values. The black overlay token remains constant across themes.
 
 ## Global components
 - `Button`: primary, ghost and danger actions

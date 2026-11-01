@@ -24,10 +24,10 @@ export function Topbar() {
   }
 
   return (
-    <header className="topbar">
-      <div><h1 className="page-title">Design System</h1><p className="page-subtitle">Fondasi UI Smart Library</p></div>
-      <div className="row">
-        <span className="muted">Petugas</span>
+    <header className="flex items-center justify-between gap-4 border-b border-border bg-surface px-4 py-4 sm:px-8">
+      <div><h1 className="font-display text-2xl font-bold sm:text-3xl">Design System</h1><p className="text-sm text-muted">Fondasi UI Smart Library</p></div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-muted">Petugas</span>
         <Button variant="ghost" onClick={toggleTheme} aria-label="Ganti tema">{theme === "light" ? "Mode gelap" : "Mode terang"}</Button>
       </div>
     </header>

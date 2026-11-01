@@ -2,7 +2,7 @@
 
 ## Execution gates
 - Execute one phase only. Stop after producing verification evidence and user instructions.
-- Never mark user approval based on automated checks. Do not start Phase 1 until user explicitly approves Phase 0.
+- Never mark user approval based on automated checks. Phase 0 was approved; user requested the CLI fix, push, then Phase 2. Stop at Phase 2 gate for user verification.
 - TASK.md is the roadmap/status authority. Keep unresolved blockers visible.
 
 ## Architecture
@@ -14,6 +14,7 @@
 ## Design contract
 - Visual source of truth: Figma Smart-Library kNDLPmgGdLgo3AKQn8FEyk, Version 2 page 153:54 pending confirmed migration. Never modify Figma during web development without permission.
 - Target is 1:1 at matched viewport. Local generators/CSS are reference evidence, not proof of live Figma parity.
+- Tailwind CSS v4 utilities are the styling layer. CSS variables in `src/styles/tokens.css` remain the design source of truth and are exposed through `@theme inline`; do not use arbitrary Tailwind values when a token exists.
 - Centralize visual values in tokens. Global patterns use shared components; feature-only compositions stay local. Do not duplicate Light/Dark pages.
 - Modal overlays retain page with black 50% scrim, keyboard dismissal/focus handling. Filter bars grow to child height and bottom-align controls.
 - No business fixtures in production workflows. Showcase fixtures must be labeled and isolated. No dead controls, unused imports or abandoned scaffold files.
