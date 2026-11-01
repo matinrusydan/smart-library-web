@@ -1,0 +1,113 @@
+/* Design tokens sourced from Smart-Library-Figma/smart-library/assets/tokens.css.
+   Figma Version 2 live comparison is still required before claiming pixel-perfect parity. */
+:root {
+  color-scheme: light;
+  --bg: #F1F4F6;
+  --sf: #FFFFFF;
+  --ink: #17212B;
+  --mu: #5B6773;
+  --ln: #DCE2E7;
+  --pr: #1E4D5C;
+  --prt: #FFFFFF;
+  --ac: #E0B13A;
+  --bad: #B3372F;
+  --ok: #2E7D4F;
+  --soft: #E6EEF1;
+  --color-bg: var(--bg);
+  --color-surface: var(--sf);
+  --color-text: var(--ink);
+  --color-muted: var(--mu);
+  --color-border: var(--ln);
+  --color-primary: var(--pr);
+  --color-on-primary: var(--prt);
+  --color-accent: var(--ac);
+  --color-danger: var(--bad);
+  --color-success: var(--ok);
+  --color-soft: var(--soft);
+  --color-accent-soft: #FBF3DC;
+  --color-success-soft: #E3F2E8;
+  --color-danger-soft: #FBE4E2;
+  --color-warning: #C98A1B;
+  --color-warning-soft: #FBF0D9;
+  --color-overlay: rgb(0 0 0 / 50%);
+  --font-heading: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --fs-h1: 30px;
+  --fs-panel: 18px;
+  --fs-stat: 34px;
+  --fs-body: 15px;
+  --fs-sm: 14px;
+  --fs-xs: 13px;
+  --fs-tag: 12px;
+  --lh-tight: 1.15;
+  --lh-base: 1.5;
+  --lh-snug: 1.1;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 10px;
+  --sp-5: 12px;
+  --sp-6: 14px;
+  --sp-7: 16px;
+  --sp-8: 18px;
+  --sp-9: 20px;
+  --sp-10: 22px;
+  --sp-11: 24px;
+  --sp-12: 32px;
+  --sp-13: 48px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 99px;
+  --sidebar-w: 250px;
+  --content-max: 1180px;
+  --sb-bg: #163A46;
+  --sb-ink: #FFFFFF;
+  --sb-muted: rgb(255 255 255 / 70%);
+  --sb-line: rgb(255 255 255 / 10%);
+  --sb-hover: rgb(255 255 255 / 8%);
+  --sb-on: rgb(255 255 255 / 12%);
+  --icon-sm: 18px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 28px;
+  --sh-card: 0 1px 3px rgb(23 33 43 / 6%), 0 1px 2px rgb(23 33 43 / 4%);
+  --sh-card-lg: 0 4px 16px rgb(23 33 43 / 7%);
+  --r-hero: 14px;
+  --r-icon: 10px;
+  --stat-min: 170px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #11171C;
+  --sf: #1A2229;
+  --ink: #E8EDF1;
+  --mu: #9AA7B2;
+  --ln: #2A353E;
+  --pr: #6FB5C8;
+  --prt: #0E1A1F;
+  --soft: #212C34;
+  --bad: #E57B72;
+  --ok: #6CC28F;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #11171C;
+    --sf: #1A2229;
+    --ink: #E8EDF1;
+    --mu: #9AA7B2;
+    --ln: #2A353E;
+    --pr: #6FB5C8;
+    --prt: #0E1A1F;
+    --soft: #212C34;
+    --bad: #E57B72;
+    --ok: #6CC28F;
+  }
+}

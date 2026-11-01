@@ -1,0 +1,28 @@
+{
+  "name": "smart-library-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:migrate": "knex migrate:latest --knexfile knexfile.js --env development",
+    "db:rollback": "knex migrate:rollback --knexfile knexfile.js --env development",
+    "db:seed": "knex seed:run --knexfile knexfile.js --env development",
+    "db:status": "knex migrate:list --knexfile knexfile.js --env development",
+    "db:check": "node scripts/check-db.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "knex": "^3.3.0",
+    "next": "16.4.3",
+    "pg": "^8.23.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3"
+  }
+}
