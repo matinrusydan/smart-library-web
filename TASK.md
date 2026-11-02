@@ -41,13 +41,15 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 - [x] Production-hardening pass: catalogue book edits now lock the row, reject stale stock totals, and derive availability from outstanding copies; creation initializes availability from total. Production Knex config accepts deployment environment credentials without loading `.env.local` or exposing production seeds. Required role constants are bootstrapped in forward migration 003 (not yet applied to local DB). Layout unified across all Petugas routes via AppShell: single shared vertical flex layout with explicit padding (top 22px, horizontal 32px desktop / 20px mobile, bottom 48px, gap 20px) and no inner max-w/mx-auto wrapping; Topbar, Dashboard and RecordList now share the exact same fluid gutters. Lint, 12 backend tests and build passed; live authenticated browser CRUD and visual parity remain unverified. No deployment/production readiness claim yet.
 
 ## Phase 3 — Circulation, fines and reports
-- [ ] Peminjaman, Pengembalian, Denda/Pembayaran, Monitoring Stok.
-- [ ] Laporan Peminjaman/Pengembalian and approved export behavior.
-- [ ] Modal/overlay interactions and audit history.
-- [ ] Phase documentation and USER GATE 3.
+- [~] Product rules confirmed by user 2026-11-02: default loan 7 calendar days; fine Rp1.000/day per borrowing transaction; fine payment must be full, no partial payments. Recorded in `docs/docs/knowledge/Circulation & Fines/Phase 3 Workflow Decisions.md`.
+- [~] Phase 3 read endpoints and staff UI for Peminjaman, Pengembalian, Denda/Pembayaran and Monitoring Stok integrated with transactional services/actions, filters and pagination. Database-backed authenticated journeys and visual parity remain unverified; no user DB mutation has been performed for testing.
+- [~] Laporan Peminjaman/Pengembalian implemented with filtered Excel `.xlsx` export (ExcelJS); browser download, report accuracy and workbook formula-safety require verification. `npm audit` reports moderate transitive advisories (no high/critical findings).
+- [~] Transaction modals implemented; full Figma parity, history overlays and audit visibility remain pending.
+- [~] Frontend spacing audit aligned circulation filter and panel rhythm with catalogue pages, bounded date controls, and normalized Dashboard section gaps. Source-level audit documented; authenticated responsive browser verification remains pending. Lint, 21 backend tests, and build passed locally; these checks do not establish visual parity.
+- [x] USER GATE 3: user explicitly approved proceeding and pushing to `main` on 2026-11-02. This is approval to move forward, not evidence that authenticated browser journeys, isolated PostgreSQL transaction testing, workbook contents, or Figma pixel parity passed. Those unresolved checks remain visible above. Phase 3 integration and workflow documentation exist; broader phase documentation is still pending.
 
 ## Phase 4 — Superadmin
-- [ ] Superadmin account management and Petugas lifecycle.
+- [~] Server-only account service prepared in parallel: create Petugas, list users, activation/deactivation with self/last-Superadmin safeguards, password reset, session revocation and audit. No UI/routes yet; database integration tests remain pending.
 - [ ] Server-enforced role protection, settings and audit visibility.
 - [ ] Superadmin visual language derived from the same design system.
 - [ ] Phase documentation and USER GATE 4.

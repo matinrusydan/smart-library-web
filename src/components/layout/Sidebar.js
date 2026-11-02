@@ -7,11 +7,11 @@ const groups = [
   { title: "Dashboard", items: [["Dashboard", "/", "dashboard"]] },
   { title: "Data Buku", items: [["Daftar Buku", "/buku", "book"], ["Master Kategori", "/kategori", "category"]] },
   { title: "Data Siswa", items: [["Data Siswa", "/siswa", "people"]] },
-  { title: "Peminjaman", items: [["Peminjaman", null, "calendar"]] },
-  { title: "Pengembalian", items: [["Pengembalian", null, "return"]] },
-  { title: "Keuangan", items: [["Denda & Pembayaran", null, "wallet"]] },
-  { title: "Monitoring", items: [["Monitoring Stok", null, "inventory"]] },
-  { title: "Laporan", items: [["Laporan Peminjaman", null, "report"], ["Laporan Pengembalian", null, "report"]] },
+  { title: "Peminjaman", items: [["Peminjaman", "/peminjaman", "calendar"]] },
+  { title: "Pengembalian", items: [["Pengembalian", "/pengembalian", "return"]] },
+  { title: "Keuangan", items: [["Denda & Pembayaran", "/denda", "wallet"]] },
+  { title: "Monitoring", items: [["Monitoring Stok", "/monitoring-stok", "inventory"]] },
+  { title: "Laporan", items: [["Laporan Peminjaman", "/laporan-peminjaman", "report"], ["Laporan Pengembalian", "/laporan-pengembalian", "report"]] },
   { title: "Pengaturan", items: [["Pengaturan", null, "settings"]] },
 ];
 
@@ -23,7 +23,7 @@ export function Sidebar() {
       <Link href="/" className="flex items-center gap-3"><Brand/><span><b className="block text-sm">Digital Library</b><small className="text-white/60">Panel Petugas</small></span></Link>
       <button type="button" aria-expanded={open} aria-controls="mobile-primary-nav" onClick={() => setOpen(v => !v)} className="min-h-[40px] rounded-lg border border-white/20 px-[12px] py-[8px] text-sm">{open ? "Tutup" : "Menu"}</button>
     </div>
-    <aside className="hidden flex-col bg-sidebar text-white min-[861px]:sticky min-[861px]:top-0 min-[861px]:flex min-[861px]:h-screen">
+    <aside className="hidden h-dvh min-h-0 flex-col overflow-hidden bg-sidebar text-white min-[861px]:sticky min-[861px]:top-0 min-[861px]:flex min-[861px]:h-screen">
       <Link href="/" className="flex min-h-[74px] items-center gap-3 border-b border-white/10 px-[20px]"><Brand/><span><span className="block font-display text-[15px] font-bold">Digital Library</span><span className="block text-xs text-white/60">Panel Petugas</span></span></Link>
       <Navigation pathname={pathname}/>
       <div className="mt-auto border-t border-white/10 p-[16px]"><button type="button" onClick={() => window.dispatchEvent(new Event("smart-library:request-logout"))} className="flex min-h-[40px] w-full items-center gap-3 rounded-lg px-[12px] py-[10px] text-sm text-white/70 transition hover:bg-red-900/30 hover:text-white"><Icon name="logout"/>Keluar Akun</button></div>
@@ -36,7 +36,7 @@ export function Sidebar() {
 function Brand() { return <span className="grid size-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-primary"><Icon name="auto_stories"/></span>; }
 
 function Navigation({ pathname }) {
-  return <nav aria-label="Navigasi utama" className="min-h-0 flex-1 space-y-3 overflow-y-auto px-0 py-4">{groups.map(group => <section key={group.title || "dashboard"}>{group.title && <h2 className="mb-1 px-4 text-[10px] font-bold uppercase tracking-[.14em] text-white/40">{group.title}</h2>}<ul className="space-y-1">{group.items.map(([item, href, icon]) => <li key={item}>{href ? <Link aria-current={pathname === href ? "page" : undefined} href={href} className={`flex items-center gap-3 px-4 py-2.5 text-[13px] transition ${pathname === href ? "bg-white/[.12] font-semibold text-white" : "text-white/65 hover:bg-white/[.07] hover:text-white"}`}><Icon name={icon}/>{item}</Link> : <span aria-disabled="true" title="Belum tersedia" className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-white/35"><Icon name={icon}/>{item}</span>}</li>)}</ul></section>)}</nav>;
+  return <nav aria-label="Navigasi utama" className="min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain px-0 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{groups.map(group => <section key={group.title || "dashboard"}>{group.title && <h2 className="mb-1 px-4 text-[10px] font-bold uppercase tracking-[.14em] text-white/40">{group.title}</h2>}<ul className="space-y-1">{group.items.map(([item, href, icon]) => <li key={item}>{href ? <Link aria-current={pathname === href ? "page" : undefined} href={href} className={`flex items-center gap-3 px-4 py-2.5 text-[13px] transition ${pathname === href ? "bg-white/[.12] font-semibold text-white" : "text-white/65 hover:bg-white/[.07] hover:text-white"}`}><Icon name={icon}/>{item}</Link> : <span aria-disabled="true" title="Belum tersedia" className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-white/35"><Icon name={icon}/>{item}</span>}</li>)}</ul></section>)}</nav>;
 }
 
 function Icon({ name }) {
