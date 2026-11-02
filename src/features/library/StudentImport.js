@@ -113,7 +113,6 @@ export function StudentImport({ open, onClose, onComplete }) {
     { key: "email", label: "Email" },
     { key: "phone", label: "Telepon" },
   ];
-  const progress = job?.total > 0 ? Math.min(100, Math.round(((job.processed || 0) / job.total) * 100)) : 0;
   const status = String(job?.status || "").toUpperCase();
 
   return <Modal open={open} onClose={onClose} title="Import siswa">
@@ -128,14 +127,15 @@ export function StudentImport({ open, onClose, onComplete }) {
       {job && <section id="student-import-status" aria-live="polite" aria-atomic="true" className="space-y-2">
         <div className="flex items-center justify-between gap-2"><strong className="text-sm">{status === "COMPLETED" ? "Import selesai" : status === "FAILED" ? "Import terhenti" : "Import berjalan"}</strong><Badge>{job.processed || 0} / {job.total || 0} siswa</Badge></div>
         <progress className="w-full accent-primary" max={job.total || 1} value={job.processed || 0} aria-label="Kemajuan import siswa" />
-        <p className="text-sm text-muted">{job.inserted || 0} ditambahkan · {job.skipped || 0} dilewati · {job.failed || 0} gagal</p>
+        <p className="text-sm text-muted">{job.inserted || 0} ditambahkan · {job.skipped || 0} dilewati</p>
+        {status === "DRAFT" && preview.length === 0 && <p className="text-sm text-muted">Pratinjau sebelumnya tidak tersimpan di browser. Pilih kembali file untuk memeriksa data sebelum konfirmasi.</p>}
       </section>}
       {validationErrors.length > 0 && <Panel title="Perlu diperbaiki" className="max-h-48 overflow-auto"><ul className="list-inside list-disc space-y-1 text-sm text-danger">{validationErrors.map((item, index) => <li key={index}>{typeof item === "string" ? item : item.message || JSON.stringify(item)}</li>)}</ul></Panel>}
       {preview.length > 0 && <Panel title={`Pratinjau (${preview.length} baris)`} className="max-h-64 overflow-auto"><DataTable columns={columns} rows={preview} getRowKey={(row, index) => row.id ?? row.studentNumber ?? index} /></Panel>}
       <footer className="flex flex-wrap justify-end gap-2">
         <Button variant="ghost" type="button" onClick={onClose}>Tutup</Button>
         {status === "FAILED" && <Button variant="surface" type="button" disabled={busy} onClick={resume}>Lanjutkan import</Button>}
-        {job && !terminal(job) && !inProgress(job) && <Button type="button" disabled={busy || validationErrors.length > 0} onClick={confirm}>{busy ? "Memproses…" : "Konfirmasi import"}</Button>}
+        {job && !terminal(job) && !inProgress(job) && <Button type="button" disabled={busy || validationErrors.length > 0 || (status === "DRAFT" && preview.length === 0)} onClick={confirm}>{busy ? "Memproses…" : "Konfirmasi import"}</Button>}
         {job && inProgress(job) && <Button type="button" disabled={busy} onClick={resume}>{busy ? "Memproses…" : "Lanjutkan import"}</Button>}
         {busy && !job && <span role="status" className="self-center text-sm text-muted">Memeriksa file…</span>}
       </footer>

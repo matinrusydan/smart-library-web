@@ -20,6 +20,7 @@ const aggregate = (job) => ({
 });
 
 export async function createStudentImport(rows) {
+  if (!Array.isArray(rows) || rows.length < 1 || rows.length > 5000 || rows.some(row => !row?.student)) throw new InputError("Data import tidak valid");
   const user = await requireUser(roles);
   const id = randomUUID();
   await db.transaction(async (trx) => {

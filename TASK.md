@@ -56,10 +56,10 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 - [x] USER GATE 4: user approved proceeding and pushing to `main` on 2026-11-02. This is approval to advance, not evidence that live authenticated browser journeys, migration 004 application, isolated PostgreSQL testing, or Vercel execution limits have passed. Those unverified items remain recorded above. Phase 4 account and student import documentation are added.
 
 ## Phase 5 — Final documentation and quality audit
-- [ ] Complete `docs/docs/knowledge` tree modeled on relevant Dashboard Ops categories.
-- [ ] Architecture, data flow, security, module, design-system, testing, operations and troubleshooting docs.
-- [ ] Full automated checks, browser journeys, accessibility/responsive checks and pixel comparison evidence.
-- [ ] Dead-code, hardcoded-style and secret audit.
+- [x] Complete `docs/docs/knowledge` tree with Architecture Overview, Authentication & Security, Circulation & Fines, Data Management, Frontend Features & Components, Infrastructure & Deployment, Getting Started, Testing Strategy, Troubleshooting & FAQ.
+- [x] Architecture, data flow, security, module, design-system, testing, operations and deployment readiness docs written and reconciled across all implemented phases.
+- [~] Source-level quality audit performed; no secrets were printed or changed. Service row bounds and import draft-resume visibility hardened. Excel template styling is intentionally authored in ExcelJS and tested as a workbook artifact (not browser CSS tokens). Automated suite includes 25 backend tests covering foundations, circulation, queries, accounts and styled workbook import; lint, tests and build pass. Remaining audit limitations: no full browser accessibility/visual scan or database integration run.
+- [!] Visual parity, authenticated browser CRUD/journey tests, isolated PostgreSQL integration, migration 004 application, and Vercel execution/upload bounds remain explicitly noted as unverified. Automated checks do not constitute evidence for these items.
 - [ ] USER GATE 5 / release sign-off.
 
 ## Release boundary

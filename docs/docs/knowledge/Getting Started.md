@@ -1,30 +1,49 @@
 # Getting Started
 
 ## Status and scope
-This document describes Phase 0 foundations only. Business modules, authentication, and schema migrations are deferred until their respective user-approved phases. See `TASK.md` for gates.
+This document describes the Smart Library web application across all implemented phases through Phase 4. Features include authentication, master data (buku, kategori, siswa), circulation (peminjaman, pengembalian), fines and full payments, stock monitoring, Excel-exportable reports, self-service settings, Superadmin account administration, and bulk student import. See `TASK.md` for gate status and unresolved verification boundaries.
 
 ## Requirements
 - Node.js 22 or compatible supported runtime
 - npm
-- PostgreSQL 16 installed locally for database work
-- Access to the Smart Library Figma file for visual validation
+- Dedicated PostgreSQL 16 database (`smart_library`)
+- Access to the Smart Library Figma file (`kNDLPmgGdLgo3AKQn8FEyk`, Version 2 page 153:54) for visual verification
 
 ## Install and run
 ```powershell
 cd C:\laragon\www\smart-library-web
 npm install
 Copy-Item .env.example .env.local
-# Edit .env.local with the local PostgreSQL credentials and dedicated DB name
+# Edit .env.local with your dedicated PostgreSQL 16 credentials
 npm run dev
 ```
-Open http://localhost:3000. The current Phase 0 page is a design-system component showcase with clearly labeled UI fixture data; it is not connected to business tables.
+Open http://localhost:3000. Unauthenticated requests redirect to `/login`.
 
-## PostgreSQL status
-Knex and `pg` are installed. Set `DATABASE_URL` in `.env.local`. No database password is assumed or stored. Do not point this app at another project database. Phase 0 connection check is pending credentials and the dedicated `smart_library` database.
+## Database setup
+1. Verify database version and dedicated database name:
+   ```powershell
+   npm run db:check
+   ```
+2. Check migration status:
+   ```powershell
+   npm run db:status
+   ```
+3. Run migrations:
+   ```powershell
+   npm run db:migrate
+   ```
+4. Create the initial Superadmin using the interactive hidden-password CLI:
+   ```powershell
+   npm run user:create -- --role superadmin --username <username> --name "<Nama Lengkap>"
+   ```
 
-## Commands
-- `npm run dev` — start local development server; verify that port 3000 is free and no stale `.next/dev` locks remain
-- `npm run lint` — ESLint
-- `npm run build` — production build
-- `npm run db:status` — list Knex migration status (requires DB configuration)
-- `npm run db:migrate` — apply migrations (schema is introduced in Phase 1)
+## Available commands
+- `npm run dev` — start local development server
+- `npm run lint` — run ESLint
+- `npm run build` — run Next.js production build
+- `npm run test:backend` — run all 25 automated backend tests
+- `npm run db:check` — verify dedicated PostgreSQL 16 connection and database allowance
+- `npm run db:status` — view Knex migration status
+- `npm run db:migrate` — apply forward migrations
+- `npm run db:rollback` — roll back the last migration batch
+- `npm run user:create` — interactive Superadmin creation CLI

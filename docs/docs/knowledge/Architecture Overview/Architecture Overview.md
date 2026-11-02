@@ -1,4 +1,4 @@
-# Architecture Overview — Phase 0
+# Architecture Overview
 
 ## Application shape
 A single full-stack Next.js App Router application using JavaScript, React, Knex.js, and PostgreSQL. It is intentionally simpler than Dashboard Ops' separate API/web monorepo while retaining explicit module and server boundaries.
@@ -10,7 +10,11 @@ A single full-stack Next.js App Router application using JavaScript, React, Knex
 - `src/features/design-system`: Phase 0 showcase, including isolated UI fixtures
 - `src/styles`: design tokens and global layout/component styles
 - `src/lib/db.js`: server-only Knex infrastructure
-- `database/migrations`, `database/seeds`: reserved for Phase 1
+- `database/migrations`, `database/seeds`: schema history and development seeds; migration 004 adds durable import jobs (application/integration verification pending)
+- `src/server`: authenticated catalogue, circulation, account and import services
+- `src/features/library`, `circulation`, `accounts`, `settings`: feature compositions
+
+For detailed request flow see `Architecture and Data Flow.md`; module responsibilities are listed in `Application Modules.md`.
 - `docs/docs/knowledge`: project knowledge documentation
 
 ## Intended data flow
