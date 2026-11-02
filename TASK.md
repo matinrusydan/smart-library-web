@@ -34,10 +34,11 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 - [~] USER GATE 1: user requested moving to Phase 2 after CLI fix; UI 1:1 review still pending.
 
 ## Phase 2 — Authentication, Petugas shell and master data
-- [ ] Secure sessions, login/logout and server-side authorization.
-- [ ] Petugas layout and Dashboard, Buku, Kategori, Siswa using real data.
-- [ ] Visual comparison for matching Figma pages in Light/Dark.
-- [ ] Phase documentation and USER GATE 2.
+- [~] Database-backed opaque sessions, Argon2 login, logout, and server-side authorization implemented; authenticated login/logout journey not yet manually verified.
+- [~] Petugas layout, Dashboard, Buku, Kategori, Siswa, real-data lists, and edit/create overlays implemented; authenticated CRUD and responsive browser journeys remain to be verified.
+- [!] User rejected visual 1:1 claim. Final local Version 2 exports confirmed by user; visual rework implemented for Login/Dashboard/Buku/Kategori/Siswa. A real 1024 × 880 Login screenshot was compared to `v2-login.png`; text/details and spacing still differ, so parity is not claimed. Authenticated Dashboard/Buku/Kategori/Siswa and Light/Dark screenshots still require real browser comparison. `v2-dashboard-dark.png` is Admin, not Petugas.
+- [x] USER GATE 2: user approved moving to Phase 3 on 2026-11-02. Phase 2 implementation committed and pushed; live authenticated browser CRUD journeys, full pixel parity, and production PostgreSQL password enforcement remain noted as unverified.
+- [x] Production-hardening pass: catalogue book edits now lock the row, reject stale stock totals, and derive availability from outstanding copies; creation initializes availability from total. Production Knex config accepts deployment environment credentials without loading `.env.local` or exposing production seeds. Required role constants are bootstrapped in forward migration 003 (not yet applied to local DB). Layout unified across all Petugas routes via AppShell: single shared vertical flex layout with explicit padding (top 22px, horizontal 32px desktop / 20px mobile, bottom 48px, gap 20px) and no inner max-w/mx-auto wrapping; Topbar, Dashboard and RecordList now share the exact same fluid gutters. Lint, 12 backend tests and build passed; live authenticated browser CRUD and visual parity remain unverified. No deployment/production readiness claim yet.
 
 ## Phase 3 — Circulation, fines and reports
 - [ ] Peminjaman, Pengembalian, Denda/Pembayaran, Monitoring Stok.
@@ -57,3 +58,6 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 - [ ] Full automated checks, browser journeys, accessibility/responsive checks and pixel comparison evidence.
 - [ ] Dead-code, hardcoded-style and secret audit.
 - [ ] USER GATE 5 / release sign-off.
+
+## Release boundary
+- [!] User requested **all roadmap features** for production on 2026-11-02; hosting provider not chosen. This is not a Phase 2-only limited release. Gates 2–5, live UI and data-flow checks, operations (TLS, backups/restore, secrets, rate limiting), and deployment choice must be closed before release.

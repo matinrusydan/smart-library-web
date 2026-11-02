@@ -12,7 +12,7 @@ export function Modal({ open, onClose, title, children }) {
   }, [open]);
 
   return (
-    <dialog ref={ref} aria-labelledby="modal-title" className="m-auto w-[min(90vw,520px)] rounded-xl border border-border bg-surface p-6 text-text shadow-xl" onClose={onClose}>
+    <dialog ref={ref} aria-labelledby="modal-title" className="m-auto w-[min(90vw,520px)] rounded-xl border border-border bg-surface p-6 text-text shadow-xl backdrop:bg-[var(--color-overlay)]" onClose={onClose}>
       <header className="flex items-center justify-between gap-4">
         <h2 id="modal-title" className="font-display text-lg font-semibold">{title}</h2>
         <Button variant="ghost" type="button" onClick={onClose} aria-label="Tutup modal">✕</Button>

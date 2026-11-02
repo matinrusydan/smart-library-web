@@ -1,10 +1,12 @@
 const path = require("node:path");
-require("dotenv").config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: path.resolve(__dirname, "..", ".env.local"), quiet: true });
+}
 const knex = require("knex");
 const { assertPostgres16, assertAllowedDatabase } = require("../src/server/database/postgres-guard");
 
 async function main() {
-  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL belum diatur di .env.local");
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL belum diatur di environment (atau .env.local untuk development)");
   const db = knex({ client: "pg", connection: process.env.DATABASE_URL });
   try {
     const result = await db.raw("SELECT current_setting('server_version_num') AS version_num, current_database() AS database_name");

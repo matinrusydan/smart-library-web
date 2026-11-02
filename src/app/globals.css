@@ -30,6 +30,7 @@
   --spacing-11: var(--sp-11);
   --spacing-12: var(--sp-12);
   --spacing-13: var(--sp-13);
+  --width-sidebar: var(--sidebar-w);
   --radius-sm: var(--r-sm);
   --radius-md: var(--r-md);
   --radius-lg: var(--r-lg);
@@ -50,6 +51,7 @@
 @layer base {
 * { box-sizing: border-box; }
 html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+::selection { background: color-mix(in srgb, var(--ac) 55%, transparent); color: var(--ink); }
 body { margin: 0; padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px); background: var(--bg); color: var(--ink); font: var(--fs-body)/var(--lh-base) var(--font-body); }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }

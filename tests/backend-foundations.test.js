@@ -4,6 +4,28 @@ const { EventEmitter } = require("node:events");
 const { assertPostgres16, assertAllowedDatabase } = require("../src/server/database/postgres-guard");
 const { parseArgs, validatePassword, hiddenQuestion } = require("../scripts/create-user");
 
+test("Knex production config uses external credentials and omits seeds", () => {
+  const previousUrl = process.env.DATABASE_URL;
+  const previousEnvironment = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  process.env.DATABASE_URL = "postgres://deployment-env.invalid/smart_library";
+  try {
+    delete require.cache[require.resolve("../knexfile")];
+    const config = require("../knexfile");
+    assert.equal(config.production.client, "pg");
+    assert.equal(config.production.connection, process.env.DATABASE_URL);
+    assert.equal(config.production.migrations.directory.endsWith("database\\migrations"), true);
+    assert.equal(Object.hasOwn(config.production, "seeds"), false);
+    assert.equal(config.development.seeds.directory.endsWith("database\\seeds"), true);
+  } finally {
+    delete require.cache[require.resolve("../knexfile")];
+    if (previousUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previousUrl;
+    if (previousEnvironment === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousEnvironment;
+  }
+});
+
 function mockTerminal() {
   const input = new EventEmitter();
   input.isTTY = true;

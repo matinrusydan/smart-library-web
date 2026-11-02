@@ -2,14 +2,14 @@
    Figma Version 2 live comparison is still required before claiming pixel-perfect parity. */
 :root {
   color-scheme: light;
-  --bg: #F1F4F6;
+  --bg: #F1F3F5;
   --sf: #FFFFFF;
   --ink: #17212B;
   --mu: #5B6773;
   --ln: #DCE2E7;
-  --pr: #1E4D5C;
+  --pr: #205161;
   --prt: #FFFFFF;
-  --ac: #E0B13A;
+  --ac: #EFB92E;
   --bad: #B3372F;
   --ok: #2E7D4F;
   --soft: #E6EEF1;
@@ -64,13 +64,20 @@
   --r-lg: 12px;
   --r-pill: 99px;
   --sidebar-w: 250px;
-  --content-max: 1180px;
-  --sb-bg: #163A46;
+  --sidebar-head-h: 60px;
+  --login-navy: #173C48;
+  --login-paper: #F1F3F5;
+  --login-gold: #EFB92E;
+  --login-book-muted: #A8C0C5;
+  --login-card-shadow: 0 8px 28px rgb(22 43 55 / 4%);
+  --content-max: 966px;
+  --sb-bg: #173C48;
   --sb-ink: #FFFFFF;
   --sb-muted: rgb(255 255 255 / 70%);
   --sb-line: rgb(255 255 255 / 10%);
   --sb-hover: rgb(255 255 255 / 8%);
   --sb-on: rgb(255 255 255 / 12%);
+  --color-badge-hero: #173C48;
   --icon-sm: 18px;
   --icon-md: 20px;
   --icon-lg: 24px;

@@ -13,7 +13,7 @@
     "db:status": "knex migrate:list --knexfile knexfile.js --env development",
     "db:check": "node scripts/check-db.js",
     "user:create": "node scripts/create-user.js",
-    "test:backend": "node --test tests/backend-foundations.test.js"
+    "test:backend": "node --test tests/backend-foundations.test.js tests/phase2-backend.test.js"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
