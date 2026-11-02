@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 const titles = { books: "Daftar Buku", categories: "Master Kategori", students: "Data Siswa" };
 const kindLabel = { books: "buku", categories: "kategori", students: "siswa" };
 
-export function RecordList({ kind, data, page, pageSize, search, active = "all", className = "all", setClassName = () => {}, categories = [], categoryId = "", setCategoryId = () => {}, setPage, setPageSize, setSearch, setActive, onCreate, onEdit }) {
+export function RecordList({ kind, data, page, pageSize, search, active = "all", className = "all", setClassName = () => {}, categories = [], categoryId = "", setCategoryId = () => {}, setPage, setPageSize, setSearch, setActive, onCreate, onEdit, onImport }) {
   const categoryNames = new Map(categories.map((item) => [String(item.id), item.name]));
   const editButton = (row) => <button type="button" onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-soft"><span aria-hidden="true">✎</span>Edit</button>;
   let columns;
@@ -30,7 +30,7 @@ export function RecordList({ kind, data, page, pageSize, search, active = "all",
   ];
 
   return <main className="flex w-full flex-col">
-    <header className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold">{titles[kind]}</h1><p className="mt-0.5 text-sm text-muted">{kind === "books" ? "Kelola koleksi dan stok buku perpustakaan" : kind === "categories" ? "Kelola kategori buku tanpa mengubah sistem" : "Kelola data siswa anggota perpustakaan"}</p></div><Button type="button" onClick={onCreate} size="sm" className="rounded-lg">＋ &nbsp;Tambah {kindLabel[kind]}</Button></header>
+     <header className="flex flex-wrap items-end justify-between gap-3"><div><h1 className="font-display text-2xl font-bold">{titles[kind]}</h1><p className="mt-0.5 text-sm text-muted">{kind === "books" ? "Kelola koleksi dan stok buku perpustakaan" : kind === "categories" ? "Kelola kategori buku tanpa mengubah sistem" : "Kelola data siswa anggota perpustakaan"}</p></div><div className="flex flex-wrap gap-2">{kind === "students" && <Button type="button" variant="surface" onClick={onImport} size="sm" className="rounded-lg">Import siswa</Button>}<Button type="button" onClick={onCreate} size="sm" className="rounded-lg">＋ &nbsp;Tambah {kindLabel[kind]}</Button></div></header>
     <div className="mt-4 flex flex-wrap items-end gap-3">
       <label className="min-w-[240px] flex-1"><span className="sr-only">Cari {kind === "books" ? "kode atau judul buku" : kind === "categories" ? "kategori" : "NIS atau nama siswa"}</span><input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder={kind === "books" ? "Cari kode atau judul buku…" : kind === "categories" ? "Cari kategori…" : "Cari NIS atau nama siswa…"} className="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary" /></label>
       {kind === "books" && <label><span className="sr-only">Kategori</span><select aria-label="Kategori" value={categoryId} onChange={(event) => { setCategoryId(event.target.value); setPage(1); }} className="block min-w-40 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text"><option value="">Semua kategori</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>}

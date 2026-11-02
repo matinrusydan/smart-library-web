@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { RecordList } from "./RecordList";
 import { RecordEditor } from "./RecordEditor";
+import { StudentImport } from "./StudentImport";
 
 export function RecordsLoader({ kind, initialData, categories = [] }) {
   const [data, setData] = useState(initialData);
@@ -15,6 +16,7 @@ export function RecordsLoader({ kind, initialData, categories = [] }) {
   const [error, setError] = useState("");
   const [editor, setEditor] = useState(undefined);
   const [revision, setRevision] = useState(0);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     if (kind !== "books" || allCategories.length) return undefined;
@@ -41,7 +43,8 @@ export function RecordsLoader({ kind, initialData, categories = [] }) {
   }, [kind, page, pageSize, search, active, className, categoryId, revision]);
 
   return <>
-    <RecordList kind={kind} data={data} page={page} pageSize={pageSize} search={search} active={active} className={className} setClassName={setClassName} categories={allCategories} categoryId={categoryId} setCategoryId={setCategoryId} setPage={setPage} setPageSize={setPageSize} setSearch={setSearch} setActive={setActive} onCreate={() => setEditor(null)} onEdit={setEditor} />
+     <RecordList kind={kind} data={data} page={page} pageSize={pageSize} search={search} active={active} className={className} setClassName={setClassName} categories={allCategories} categoryId={categoryId} setCategoryId={setCategoryId} setPage={setPage} setPageSize={setPageSize} setSearch={setSearch} setActive={setActive} onCreate={() => setEditor(null)} onEdit={setEditor} onImport={() => setImportOpen(true)} />
+     {kind === "students" && <StudentImport open={importOpen} onClose={() => setImportOpen(false)} onComplete={() => setRevision((value) => value + 1)} />}
     {error && <p role="alert" className="mx-8 mb-4 rounded-lg bg-danger/10 p-3 text-danger">{error}<button onClick={() => setRevision((value) => value + 1)} className="ml-2 underline">Coba lagi</button></p>}
     {editor !== undefined && <RecordEditor kind={kind} record={editor} categories={allCategories} onClose={() => setEditor(undefined)} onSaved={() => { setEditor(undefined); setRevision((value) => value + 1); }} />}
   </>;

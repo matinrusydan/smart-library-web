@@ -1,0 +1,7 @@
+# Phase 4 Account Administration (backend)
+
+Account management is implemented as server-only services in `src/server/admin-accounts.js`; the corresponding server actions are in `src/app/actions/admin-accounts.js`. Every service checks the current session and role itself. Petugas can update their own display name and password and revoke their other sessions. Superadmin-only operations list accounts/audit entries, create Petugas, activate/deactivate accounts, reset passwords, and revoke an account's sessions.
+
+Passwords use Argon2. A self-service password change verifies the current password before updating it, then revokes all other sessions while retaining the current opaque session. Resetting a user's password revokes all of that user's sessions. Deactivation also revokes all sessions. Account create/deactivation/reset/revocation are transaction-backed and audit credential-management events without storing/logging passwords or hashes. Account lifecycle operations use a PostgreSQL transaction advisory lock for self/last-active-Superadmin safeguards.
+
+Audit visibility is limited to the latest 200 user-account events, newest first. The actions return `{ data }` for success and `{ error }` for validated input failures; authentication/authorization errors are not converted into successful-looking responses. No Phase 4 UI is included here. Database integration and authenticated browser verification remain pending; these services have not been exercised against a live user database as part of implementation.

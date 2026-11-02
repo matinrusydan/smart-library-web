@@ -49,10 +49,11 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 - [x] USER GATE 3: user explicitly approved proceeding and pushing to `main` on 2026-11-02. This is approval to move forward, not evidence that authenticated browser journeys, isolated PostgreSQL transaction testing, workbook contents, or Figma pixel parity passed. Those unresolved checks remain visible above. Phase 3 integration and workflow documentation exist; broader phase documentation is still pending.
 
 ## Phase 4 — Superadmin
-- [~] Server-only account service prepared in parallel: create Petugas, list users, activation/deactivation with self/last-Superadmin safeguards, password reset, session revocation and audit. No UI/routes yet; database integration tests remain pending.
-- [ ] Server-enforced role protection, settings and audit visibility.
-- [ ] Superadmin visual language derived from the same design system.
-- [ ] Phase documentation and USER GATE 4.
+- [~] Server-only account services/actions: create/list Petugas/accounts, activation/deactivation with self/last-Superadmin safeguards, password reset, session revocation, own profile/password settings, and account audit listing. No UI; database integration tests remain pending.
+- [~] Server-enforced account management and self-service settings implemented in `src/server/admin-accounts.js` and `src/app/actions/admin-accounts.js`; focused validation tests/lint pass, database integration and authenticated browser verification pending.
+- [~] `/pengaturan` and Superadmin `/petugas` UI implemented using AppShell, global tokens and shared components. Account creation layout now separates three top-aligned fields from password guidance and the submit row; panels use global default padding. Lint and build pass; authenticated browser/responsive verification remains pending.
+- [~] Bulk student import implemented as a durable database job processed in bounded 100-row requests, with `.xlsx` validation/preview, resumable browser orchestration, styled template, duplicate-NIS skip policy, overall-only progress UI, ownership checks and audit summaries. Parser/template tests pass; migration 004, authenticated browser flow, isolated PostgreSQL concurrency/integration and Vercel runtime remain unverified.
+- [x] USER GATE 4: user approved proceeding and pushing to `main` on 2026-11-02. This is approval to advance, not evidence that live authenticated browser journeys, migration 004 application, isolated PostgreSQL testing, or Vercel execution limits have passed. Those unverified items remain recorded above. Phase 4 account and student import documentation are added.
 
 ## Phase 5 — Final documentation and quality audit
 - [ ] Complete `docs/docs/knowledge` tree modeled on relevant Dashboard Ops categories.
