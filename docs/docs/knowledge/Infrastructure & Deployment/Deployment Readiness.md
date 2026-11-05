@@ -6,6 +6,8 @@ The application builds with Next.js and uses PostgreSQL through Knex. The hostin
 
 ## Vercel-specific considerations to resolve
 
+- Pin function execution region next to the database (`"regions": ["sin1"]` in `vercel.json` matching Neon Singapore `sin1`) to avoid cross-continent round-trips between serverless compute and PostgreSQL.
+- Deduplicate per-request session lookups with `React.cache()`, render initial catalogue/circulation lists directly from Server Components, avoid client mount refetches, and disable bulk sidebar route prefetching (`prefetch={false}`) to protect the bounded database connection pool (`DB_POOL_MAX`).
 - Student import currently parses an uploaded workbook in an HTTP request, persists a durable job, then processes bounded batches through sequential browser-triggered requests. Closing the browser pauses work; this is not an autonomous queue.
 - A bounded database batch does **not** bound the initial upload, ExcelJS workbook parsing time/memory, or total client polling time.
 - Before deployment, verify request body/upload size, function duration, memory, Node runtime support for `argon2`, database networking/connection pooling, function concurrency and rate limiting on the selected Vercel plan.

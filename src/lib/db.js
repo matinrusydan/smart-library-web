@@ -11,7 +11,7 @@ function createDbInstance() {
     pool: {
       min: 0,
       max: Number(process.env.DB_POOL_MAX) || 5,
-      idleTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
       acquireTimeoutMillis: 15000,
       afterCreate(connection, done) {
         if (!process.env.DATABASE_URL) {

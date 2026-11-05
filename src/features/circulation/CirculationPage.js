@@ -21,25 +21,32 @@ const money = (value) => new Intl.NumberFormat("id-ID", { style: "currency", cur
 const date = (value) => value ? new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`)) : "—";
 const statusLabel = { borrowed: "Dipinjam", overdue: "Terlambat", returned: "Dikembalikan", unpaid: "Belum lunas", paid: "Lunas", low: "Menipis", empty: "Habis", available: "Tersedia" };
 
-export default function CirculationPage({ kind }) {
+const buildCirculationKey = (kind, query, status, page, pageSize, from, to) =>
+  JSON.stringify([kind, query, status, page, pageSize, from, to]);
+
+export default function CirculationPage({ kind, initialData }) {
   const meta = config[kind];
-  const [rows, setRows] = useState([]), [total, setTotal] = useState(0), [summary, setSummary] = useState({}), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(10);
-  const [query, setQuery] = useState(""), [status, setStatus] = useState("all"), [from, setFrom] = useState(""), [to, setTo] = useState(""), [draftFrom, setDraftFrom] = useState(""), [draftTo, setDraftTo] = useState("");
-  const [loading, setLoading] = useState(true), [error, setError] = useState(""), [modal, setModal] = useState(false), [notice, setNotice] = useState("");
+  const [rows, setRows] = useState(initialData?.items ?? []), [total, setTotal] = useState(initialData?.total ?? 0), [summary, setSummary] = useState(initialData?.summary ?? {}), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(10);
+  const [query, setQuery] = useState(""), [debouncedQuery, setDebouncedQuery] = useState(""), [status, setStatus] = useState("all"), [from, setFrom] = useState(""), [to, setTo] = useState(""), [draftFrom, setDraftFrom] = useState(""), [draftTo, setDraftTo] = useState("");
+  const [loading, setLoading] = useState(!initialData), [error, setError] = useState(""), [modal, setModal] = useState(false), [notice, setNotice] = useState("");
   const requestId = useRef(0);
-  const load = useCallback(async () => {
+  const lastLoadedKey = useRef(initialData ? buildCirculationKey(kind, "", "all", 1, 10, "", "") : null);
+  useEffect(() => { const timer = setTimeout(() => setDebouncedQuery(query), query ? 250 : 0); return () => clearTimeout(timer); }, [query]);
+  const load = useCallback(async (force = false) => {
+    const queryKey = buildCirculationKey(kind, debouncedQuery, status, page, pageSize, from, to);
+    if (!force && lastLoadedKey.current === queryKey) return;
     const currentRequest = ++requestId.current;
     setLoading(true); setError("");
     try {
-      const params = new URLSearchParams({ kind, query, status, page: String(page), pageSize: String(pageSize) });
+      const params = new URLSearchParams({ kind, query: debouncedQuery, status, page: String(page), pageSize: String(pageSize) });
       if (from) params.set("from", from); if (to) params.set("to", to);
       const response = await fetch(`/api/circulation?${params}`, { cache: "no-store" });
       const data = await response.json(); if (!response.ok) throw new Error(data.error || "Daftar tidak dapat dimuat.");
-      if (currentRequest === requestId.current) { setRows(data.items); setTotal(data.total); setSummary(data.summary || {}); }
+      if (currentRequest === requestId.current) { lastLoadedKey.current = queryKey; setRows(data.items); setTotal(data.total); setSummary(data.summary || {}); }
     } catch (e) { if (currentRequest === requestId.current) { setError(e.message); setRows([]); setTotal(0); } } finally { if (currentRequest === requestId.current) setLoading(false); }
-  }, [kind, query, status, page, pageSize, from, to]);
-  useEffect(() => { const timer = setTimeout(() => load(), 0); return () => clearTimeout(timer); }, [load]);
-  const refresh = () => { setModal(false); setNotice("Perubahan berhasil disimpan."); load(); };
+  }, [kind, debouncedQuery, status, page, pageSize, from, to]);
+  useEffect(() => { const timer = setTimeout(() => load(false), 0); return () => clearTimeout(timer); }, [load]);
+  const refresh = () => { setModal(false); setNotice("Perubahan berhasil disimpan."); load(true); };
   const report = kind.endsWith("report");
   const circulationPage = kind === "borrowings" || kind === "returns";
   const exportParams = new URLSearchParams({ kind, query, status }); if (from) exportParams.set("from", from); if (to) exportParams.set("to", to);
@@ -79,7 +86,7 @@ export default function CirculationPage({ kind }) {
     {(report || kind === "fines" || kind === "stock") && <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">{(kind === "fines" ? [["Total Denda",summary.totalAmount ?? summary.totalFines,summary.totalRecords ?? summary.fineCount,"receipt"],["Sudah Dibayar",summary.paidAmount,summary.paidRecords ?? summary.paidCount,"check_circle"],["Belum Dibayar",summary.unpaidAmount,summary.unpaidRecords ?? summary.unpaidCount,"error"]] : kind === "stock" ? [["Total Judul",summary.totalTitles,null,"menu_book"],["Total Eksemplar",summary.totalCopies,null,"library_books"],["Stok Tersedia",summary.availableCopies,null,"inventory_2"]] : kind === "borrowing-report" ? [["Total Peminjaman",summary.totalBorrowings,null,"library_books"],["Sedang Dipinjam",summary.activeBorrowings ?? summary.currentlyBorrowed,null,"schedule"],["Terlambat",summary.overdueBorrowings ?? summary.overdue,null,"error"]] : [["Total Pengembalian",summary.totalReturns,null,"assignment_return"],["Total Denda",summary.totalFine ?? summary.totalFines,null,"receipt"],["Buku Hilang",summary.lostBooks == null ? "—" : summary.lostBooks,null,"report"]]).map(([label,value,count,icon]) => <Panel key={label} className="relative min-h-[155px] p-5 transition-shadow hover:shadow-md"><div className="mb-3 flex items-start justify-between"><span className="grid size-10 place-items-center rounded-[10px] bg-soft text-primary" aria-hidden="true"><SummaryIcon name={icon}/></span><span className="rounded-full bg-soft px-2.5 py-1 text-[11px] font-semibold text-primary">{count == null ? "Ringkasan" : `${count} catatan`}</span></div><p className="text-sm font-medium text-muted">{label}</p><p className="mt-1 font-display text-3xl font-bold tracking-tight">{label.includes("Denda") || label.includes("Dibayar") ? moneyOrDash(value) : value ?? "—"}</p></Panel>)}</div>}
     {kind === "stock" && <label className="mt-4 min-w-[240px] max-w-[340px] flex-1"><span className="sr-only">Cari buku</span><input aria-label="Cari buku" value={query} onChange={e => { setQuery(e.target.value); setPage(1); }} placeholder="Cari buku…" className="block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary"/></label>}
     <Panel title={kind === "borrowings" ? "Peminjaman Aktif" : kind === "returns" ? "Harus Dikembalikan" : kind === "fines" ? "Daftar Denda" : meta.title} className="mt-3 p-3 sm:p-3.5">
-        <div className="mt-1">{error ? <div role="alert" className="rounded-lg border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error} <button className="ml-2 underline" onClick={load}>Coba lagi</button></div> : loading ? <p className="p-8 text-center text-sm text-muted">Memuat data…</p> : rows.length ? <DataTable columns={report ? reportColumns : columns} rows={rows} getRowKey={r => r.id}/> : <div className="rounded-lg border border-dashed border-border p-10 text-center"><p className="font-semibold">Belum ada data yang cocok</p><p className="mt-1 text-sm text-muted">Coba ubah kata pencarian atau filter.</p></div>}</div>
+        <div className="mt-1">{error ? <div role="alert" className="rounded-lg border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error} <button className="ml-2 underline" onClick={() => load(true)}>Coba lagi</button></div> : loading ? <p className="p-8 text-center text-sm text-muted">Memuat data…</p> : rows.length ? <DataTable columns={report ? reportColumns : columns} rows={rows} getRowKey={r => r.id}/> : <div className="rounded-lg border border-dashed border-border p-10 text-center"><p className="font-semibold">Belum ada data yang cocok</p><p className="mt-1 text-sm text-muted">Coba ubah kata pencarian atau filter.</p></div>}</div>
         <Pagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} onPageSizeChange={setPageSize}/>
      </Panel>
       {circulationPage ? <FeatureDialog open={modal} onClose={() => setModal(false)} title={kind === "borrowings" ? "Input Peminjaman" : "Proses Pengembalian"} subtitle={kind === "borrowings" ? "Catat peminjaman buku siswa" : "Catat pengembalian & denda"}>
@@ -94,8 +101,9 @@ function Person({ row }) { return <div><strong className="block">{row.studentNam
 function moneyOrDash(value) { return value == null || value === "" ? "—" : money(value); }
 function Status({ value }) { return <Badge tone={value === "overdue" || value === "unpaid" || value === "empty" ? "danger" : ["returned","paid","available"].includes(value) ? "success" : "neutral"}>{statusLabel[value] || value}</Badge>; }
 function Selector({ label, endpoint, selected, onSelect, display }) {
-  const [term, setTerm] = useState(""), [page, setPage] = useState(1), [data, setData] = useState({ items: [], pageCount: 0 }), [error, setError] = useState("");
-  useEffect(() => { let alive = true; fetch(`${endpoint}?query=${encodeURIComponent(term)}&page=${page}&pageSize=10`).then(async r => { const d = await r.json(); if (!r.ok) throw new Error(d.error || "Tidak dapat memuat pilihan."); return d; }).then(d => { if (alive) { setData(d); setError(""); } }).catch(e => { if (alive) { setData({ items: [], pageCount: 0 }); setError(e.message || "Tidak dapat memuat pilihan."); } }); return () => { alive = false; }; }, [endpoint, term, page]);
+  const [term, setTerm] = useState(""), [debouncedTerm, setDebouncedTerm] = useState(""), [page, setPage] = useState(1), [data, setData] = useState({ items: [], pageCount: 0 }), [error, setError] = useState("");
+  useEffect(() => { const timer = setTimeout(() => setDebouncedTerm(term), term ? 250 : 0); return () => clearTimeout(timer); }, [term]);
+  useEffect(() => { const abort = new AbortController(); let alive = true; fetch(`${endpoint}?query=${encodeURIComponent(debouncedTerm)}&page=${page}&pageSize=10`, { signal: abort.signal }).then(async r => { const d = await r.json(); if (!r.ok) throw new Error(d.error || "Tidak dapat memuat pilihan."); return d; }).then(d => { if (alive) { setData(d); setError(""); } }).catch(e => { if (alive && e.name !== "AbortError") { setData({ items: [], pageCount: 0 }); setError(e.message || "Tidak dapat memuat pilihan."); } }); return () => { alive = false; abort.abort(); }; }, [endpoint, debouncedTerm, page]);
   return <div className="space-y-2"><label className="block text-sm font-medium">{label}</label><input value={term} onChange={e => { setTerm(e.target.value); setPage(1); setError(""); }} placeholder={`Cari ${label.toLowerCase()}…`} className="w-full rounded-md border border-border bg-surface px-3 py-2.5"/><div className="max-h-36 overflow-auto rounded-md border border-border">{data.items?.map(item => <button key={item.id} type="button" onClick={() => onSelect(item)} className={`block w-full border-b border-border px-3 py-2 text-left text-sm hover:bg-soft ${selected?.id === item.id ? "bg-soft font-semibold" : ""}`}>{display(item)}</button>)}{!data.items?.length && <p className="p-3 text-sm text-muted">Tidak ditemukan.</p>}</div>{error && <p role="alert" className="text-sm text-danger">{error}</p>}<div className="flex items-center justify-between text-xs text-muted"><span>{selected ? `Dipilih: ${display(selected)}` : "Pilih satu hasil"}</span><span><button type="button" disabled={page <= 1} onClick={() => setPage(page - 1)} className="mr-3 disabled:opacity-40">‹ Sebelumnya</button><button type="button" disabled={page >= (data.pageCount || 1)} onClick={() => setPage(page + 1)} className="disabled:opacity-40">Berikutnya ›</button></span></div></div>;
 }
 function FormShell({ children, onSubmit, busy, error, submit, onCancel }) { return <form onSubmit={onSubmit} className="space-y-3">{children}{error && <p role="alert" className="text-sm text-danger">{error}</p>}<div className="flex gap-2 pt-1"><Button type="submit" size="sm" disabled={busy}>{busy ? "Menyimpan…" : submit}</Button>{onCancel && <Button type="button" variant="ghost" size="sm" onClick={onCancel}>Batal</Button>}</div></form>; }

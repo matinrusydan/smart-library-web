@@ -18,8 +18,10 @@ async function list(table, args, columns, filter) {
     base.where("is_active", args.active === true || args.active === "true");
   }
   if (table === "books" && args.categoryId) base.where("category_id", positiveId(args.categoryId, "Kategori"));
-  const countRow = await base.clone().count({ count: "*" }).first();
-  const items = await base.clone().select(columns).orderBy(table === "books" ? "title" : "name").orderBy("id").limit(pageSize).offset(offset);
+  const [countRow, items] = await Promise.all([
+    base.clone().count({ count: "*" }).first(),
+    base.clone().select(columns).orderBy(table === "books" ? "title" : "name").orderBy("id").limit(pageSize).offset(offset),
+  ]);
   const total = Number(countRow.count);
   return { items, total, page, pageSize, pageCount: Math.ceil(total / pageSize) };
 }
@@ -38,16 +40,18 @@ export async function listStudents(args = {}) {
 
 export async function getDashboardSummary() {
   await requireUser(["superadmin", "petugas"]);
-  const [books, bookTitles, categories, students, activeBorrowings, overdueBorrowings, lowStockBooks, returnedBorrowings, recentBorrowings] = await Promise.all([
-    db("books").sum({ count: "stock_total" }).first(),
-    db("books").count({ count: "*" }).first(),
-    db("categories").where("is_active", true).count({ count: "*" }).first(),
-    db("students").where("is_active", true).count({ count: "*" }).first(),
-    db("borrowings").whereIn("status", ["borrowed", "overdue"]).count({ count: "*" }).first(),
-    db("borrowings").where("status", "overdue").count({ count: "*" }).first(),
-    // Low stock means 1-2 available copies; zero-stock books are out of stock, not low stock.
-    db("books").whereBetween("stock_available", [1, 2]).count({ count: "*" }).first(),
-    db("borrowings").where("status", "returned").count({ count: "*" }).first(),
+  const [[counts], recentBorrowings] = await Promise.all([
+    db.select({
+      bookCopies: db("books").sum("stock_total"),
+      bookTitles: db("books").count("*"),
+      activeCategories: db("categories").where("is_active", true).count("*"),
+      activeStudents: db("students").where("is_active", true).count("*"),
+      activeBorrowings: db("borrowings").whereIn("status", ["borrowed", "overdue"]).count("*"),
+      overdueBorrowings: db("borrowings").where("status", "overdue").count("*"),
+      // Low stock means 1-2 available copies; zero-stock books are out of stock, not low stock.
+      lowStockBooks: db("books").whereBetween("stock_available", [1, 2]).count("*"),
+      returnedBorrowings: db("borrowings").where("status", "returned").count("*"),
+    }),
     db("borrowings as br")
       .join("students as st", "st.id", "br.student_id")
       .select("br.id", "st.name as studentName", "br.borrowed_at as borrowedAt", "br.status")
@@ -66,14 +70,14 @@ export async function getDashboardSummary() {
       .limit(6),
   ]);
   return {
-    bookCopies: Number(books.count || 0),
-    bookTitles: Number(bookTitles.count || 0),
-    activeCategories: Number(categories.count || 0),
-    activeStudents: Number(students.count || 0),
-    activeBorrowings: Number(activeBorrowings.count || 0),
-    overdueBorrowings: Number(overdueBorrowings.count || 0),
-    lowStockBooks: Number(lowStockBooks.count || 0),
-    returnedBorrowings: Number(returnedBorrowings.count || 0),
+    bookCopies: Number(counts?.bookCopies || 0),
+    bookTitles: Number(counts?.bookTitles || 0),
+    activeCategories: Number(counts?.activeCategories || 0),
+    activeStudents: Number(counts?.activeStudents || 0),
+    activeBorrowings: Number(counts?.activeBorrowings || 0),
+    overdueBorrowings: Number(counts?.overdueBorrowings || 0),
+    lowStockBooks: Number(counts?.lowStockBooks || 0),
+    returnedBorrowings: Number(counts?.returnedBorrowings || 0),
     recentBorrowings: recentBorrowings.map((borrowing) => ({
       id: borrowing.id,
       studentName: borrowing.studentName,

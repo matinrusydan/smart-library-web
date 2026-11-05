@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createHash, randomBytes } from "node:crypto";
 import argon2 from "argon2";
 import { cookies } from "next/headers";
@@ -26,7 +27,7 @@ export async function authenticateUser({ username, password }) {
 // Fixed Argon2 hash keeps unknown-user attempts on the same expensive verify path.
 const DUMMY_HASH = "$argon2id$v=19$m=65536,p=4,t=3$1roC/GKTjHuU6dBoOJW7lw$qPUNucfXb9zMEce1ppN1PezD3dcPFrS6VbYgw5yHqV4";
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token || !/^[A-Za-z0-9_-]{40,50}$/.test(token)) return null;
   const record = await db("sessions as s").join("users as u", "u.id", "s.user_id").join("roles as r", "r.id", "u.role_id")
@@ -34,7 +35,7 @@ export async function getCurrentUser() {
     .where("s.token_hash", hashToken(token)).whereNull("s.revoked_at").where("s.expires_at", ">", db.fn.now()).first();
   if (!record || !record.is_active) return null;
   return { id: record.id, username: record.username, name: record.name, role: record.role, expiresAt: record.expires_at };
-}
+});
 
 export async function requireUser(allowedRoles) {
   const user = await getCurrentUser();

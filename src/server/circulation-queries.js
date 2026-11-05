@@ -40,7 +40,7 @@ async function loanPage(input, today) {
       db.raw("count(br.id) filter (where br.returned_at is null)::int as active_borrowings"),
       db.raw("count(br.id) filter (where br.returned_at is null and br.due_at < ?)::int as overdue_borrowings", [today]),
     ).first(),
-    db("fines as f").whereIn("f.borrowing_id", base.clone().clearSelect().clearOrder().select("br.id")).sum({ total_fine: "f.amount" }).first(),
+    input.kind === "return-report" ? db("fines as f").whereIn("f.borrowing_id", base.clone().clearSelect().clearOrder().select("br.id")).sum({ total_fine: "f.amount" }).first() : Promise.resolve(null),
     base.clone().select("br.id", "br.student_id", "st.name as student_name", "st.student_number", "st.class_name", "br.status")
       .select({ borrowed_at: date("br.borrowed_at"), due_at: date("br.due_at"), returned_at: date("br.returned_at") })
       .select(db.raw("coalesce((select sum(f.amount) from fines f where f.borrowing_id = br.id), 0)::bigint as fine_amount"))
