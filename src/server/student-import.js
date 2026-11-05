@@ -71,8 +71,13 @@ export async function processStudentImport(id) {
     return result;
   } catch (error) {
     if (error instanceof InputError) throw error;
-    // The transaction rolls back both inserts and cursor. Keep the job resumable;
-    // a separate failure update could race a concurrent successful request.
+    try {
+      await db("student_import_jobs").where({ id, created_by: user.id }).update({
+        status: "failed",
+        last_error: error.message || "Pemrosesan batch gagal",
+        updated_at: db.fn.now(),
+      });
+    } catch (_) {}
     throw error;
   }
 }

@@ -57,8 +57,8 @@ Status: `[ ]` pending · `[~]` implemented, awaiting verification · `[x]` user 
 
 ## Phase 5 — Final documentation and quality audit
 - [x] Complete `docs/docs/knowledge` tree with Architecture Overview, Authentication & Security, Circulation & Fines, Data Management, Frontend Features & Components, Infrastructure & Deployment, Getting Started, Testing Strategy, Troubleshooting & FAQ.
-- [x] Architecture, data flow, security, module, design-system, testing, operations and deployment readiness docs written and reconciled across all implemented phases.
-- [~] Source-level quality audit performed; no secrets were printed or changed. Service row bounds and import draft-resume visibility hardened. Excel template styling is intentionally authored in ExcelJS and tested as a workbook artifact (not browser CSS tokens). Automated suite includes 25 backend tests covering foundations, circulation, queries, accounts and styled workbook import; lint, tests and build pass. Remaining audit limitations: no full browser accessibility/visual scan or database integration run.
+- [x] Architecture, data flow, security, module, design-system, testing, operations and deployment readiness docs written and reconciled across all implemented phases; Phase 5 audit evidence and dependency advisory status recorded in `docs/docs/knowledge/Testing Strategy/Phase 5 Quality Audit.md`.
+- [x] Code quality, dead-code, hardcoded-style and token audit performed. Dependency audit reports 9 moderate transitive advisories originating from `exceljs` (no high or critical findings; `npm audit fix --force` would downgrade to 3.4.0 and is deferred). Secret pattern scan across tracked code confirmed 0 tracked non-example `.env` files and 0 credential-pattern matches. Service bounds and draft-resume UX hardened; 25 backend tests, lint, and build pass.
 - [!] Visual parity, authenticated browser CRUD/journey tests, isolated PostgreSQL integration, migration 004 application, and Vercel execution/upload bounds remain explicitly noted as unverified. Automated checks do not constitute evidence for these items.
 - [ ] USER GATE 5 / release sign-off.
 

@@ -1,5 +1,7 @@
 const path = require("node:path");
-require("dotenv").config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
+}
 const knexFactory = require("knex");
 
 function parseArgs(args) {

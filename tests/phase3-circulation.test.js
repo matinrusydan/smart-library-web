@@ -10,11 +10,11 @@ test("calendar validation and Jakarta today use explicit calendar dates", async 
 });
 
 test("borrowing validation enforces unique IDs, positive quantity and seven-day default", async () => {
-  const { borrowingInput, paymentInput } = await import("../src/server/validation-circulation.js");
+  const { borrowingInput, paymentInput, jakartaToday, addCalendarDays } = await import("../src/server/validation-circulation.js");
   assert.deepEqual(borrowingInput({ studentId: "2", borrowedAt: "2026-11-02", items: [{ bookId: "9", quantity: "2" }, { bookId: "3", quantity: 1 }] }), {
     studentId: "2", borrowedAt: "2026-11-02", dueAt: "2026-11-09", items: [{ bookId: "3", quantity: 1 }, { bookId: "9", quantity: 2 }],
   });
-  assert.equal(borrowingInput({ studentId: "2", items: [{ bookId: "1", quantity: 1 }] }).dueAt, "2026-11-09");
+  assert.equal(borrowingInput({ studentId: "2", items: [{ bookId: "1", quantity: 1 }] }).dueAt, addCalendarDays(jakartaToday(), 7));
   assert.throws(() => borrowingInput({ studentId: "2", items: [{ bookId: "1", quantity: 1 }, { bookId: "1", quantity: 2 }] }));
   assert.throws(() => borrowingInput({ studentId: "2", items: [{ bookId: "1", quantity: 0 }] }));
   assert.throws(() => borrowingInput({ studentId: "2", items: [] }));

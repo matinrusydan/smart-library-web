@@ -5,6 +5,8 @@ import { parseStudentWorkbook, IMPORT_MAX_BYTES } from "@/server/student-import-
 import { InputError } from "@/server/validation";
 import { importFailure } from "@/server/student-import-http";
 
+export const maxDuration = 60;
+
 export async function POST(request) {
   try {
     await requireUser(["superadmin", "petugas"]);

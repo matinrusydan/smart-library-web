@@ -4,6 +4,8 @@ import { CirculationExportLimitError, createCirculationExport } from "@/server/c
 
 const MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
+export const maxDuration = 60;
+
 export async function GET(request) {
   try {
     const args = Object.fromEntries(new URL(request.url).searchParams.entries());
