@@ -1,7 +1,7 @@
 function assertPostgres16(versionNumber) {
   const version = Number(versionNumber);
-  if (!Number.isInteger(version) || version < 160000 || version >= 170000) {
-    throw new Error(`Perlu PostgreSQL 16, server saat ini versi ${versionNumber ?? "unknown"}`);
+  if (!Number.isInteger(version) || version < 160000) {
+    throw new Error(`Perlu PostgreSQL 16 atau lebih baru, server saat ini versi ${versionNumber ?? "unknown"}`);
   }
 }
 

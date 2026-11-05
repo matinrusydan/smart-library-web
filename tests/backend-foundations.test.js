@@ -37,9 +37,10 @@ function mockTerminal() {
   return { input, output: { write: (text) => { outputText += text; } }, getOutput: () => outputText };
 }
 
-test("PostgreSQL guard accepts only major version 16", () => {
+test("PostgreSQL guard accepts PostgreSQL version 16 or newer", () => {
   assert.doesNotThrow(() => assertPostgres16("160003"));
-  for (const version of ["150010", "170000", "bad", undefined]) assert.throws(() => assertPostgres16(version), /Perlu PostgreSQL 16/);
+  assert.doesNotThrow(() => assertPostgres16("180006"));
+  for (const version of ["150010", "140002", "bad", undefined]) assert.throws(() => assertPostgres16(version), /Perlu PostgreSQL 16/);
 });
 
 test("database guard blocks databases outside the explicit project allowance", () => {
