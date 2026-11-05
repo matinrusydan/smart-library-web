@@ -15,6 +15,7 @@
     "db:status:prod": "knex migrate:list --knexfile knexfile.js --env production",
     "db:check": "node scripts/check-db.js",
     "user:create": "node scripts/create-user.js",
+    "user:create:prod": "node scripts/create-user-prod.js",
     "test:backend": "node --test tests/backend-foundations.test.js tests/phase2-backend.test.js tests/phase3-circulation.test.js tests/phase3-queries.test.js tests/phase4-admin-accounts.test.js tests/student-import.test.js"
   },
   "dependencies": {

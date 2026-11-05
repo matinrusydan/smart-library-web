@@ -36,6 +36,17 @@ Open http://localhost:3000. Unauthenticated requests redirect to `/login`.
    ```powershell
    npm run user:create -- --role superadmin --username <username> --name "<Nama Lengkap>"
    ```
+   Atau untuk database produksi (Neon Cloud):
+   ```powershell
+   npm run user:create:prod
+   ```
+
+### Initial Superadmin Reference
+Untuk keperluan verifikasi dan testing akses awal:
+- **URL**: `https://smart-library-web-ten.vercel.app/login` (atau `http://localhost:3000/login`)
+- **Username**: `admin`
+- **Password**: `Adminperpus123!`
+- **Role**: `superadmin`
 
 ## Available commands
 - `npm run dev` — start local development server

@@ -5,6 +5,13 @@ if (process.env.NODE_ENV !== "production") {
 const knexFactory = require("knex");
 
 function parseArgs(args) {
+  if (args.length === 3 && !args[0].startsWith("--")) {
+    if (args[0] !== "superadmin") throw new Error("CLI hanya menerima --role superadmin");
+    const username = args[1], name = args[2];
+    if (!username || !/^[a-zA-Z0-9._-]{3,64}$/.test(username)) throw new Error("Username harus 3-64 karakter: huruf, angka, titik, garis bawah, atau strip");
+    if (!name || name.trim().length < 2 || name.trim().length > 160 || /[\u0000-\u001f]/.test(name)) throw new Error("Nama harus 2-160 karakter");
+    return { username, name: name.trim() };
+  }
   const values = {};
   for (let i = 0; i < args.length; i += 2) {
     const key = args[i];

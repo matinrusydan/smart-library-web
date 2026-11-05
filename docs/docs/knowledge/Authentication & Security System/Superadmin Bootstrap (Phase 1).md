@@ -20,3 +20,11 @@ Password harus diminta secara interaktif dan input disembunyikan; jangan menerim
 
 ## Verifikasi
 Gate Phase 1 memerlukan test guard/validasi/role, migrasi pada database dedicated setelah koneksi terverifikasi, lalu pembuatan akun dengan password prompt tersembunyi. Password/hash tidak dicetak kembali dalam output.
+
+## Initial Superadmin Credential (Environment Reference)
+Untuk keperluan pengujian rilis dan deployment awal sistem:
+- **Username**: `admin`
+- **Initial Password**: `Adminperpus123!`
+- **Role**: `superadmin`
+- **Scope**: Local Development (`smart_library`) & Vercel Production (`neondb`)
+- **Hash Algorithm**: Argon2id via `argon2` npm package.
