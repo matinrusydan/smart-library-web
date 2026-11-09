@@ -101,6 +101,7 @@
   --soft: #212C34;
   --bad: #E57B72;
   --ok: #6CC28F;
+  --color-danger-soft: #382426;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -116,5 +117,6 @@
     --soft: #212C34;
     --bad: #E57B72;
     --ok: #6CC28F;
+    --color-danger-soft: #382426;
   }
 }

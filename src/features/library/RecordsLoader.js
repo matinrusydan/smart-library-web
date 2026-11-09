@@ -47,7 +47,7 @@ export function RecordsLoader({ kind, initialData, categories }) {
     let current = true;
     const abort = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), query: debouncedSearch,
-      ...(kind === "categories" ? { active } : {}),
+      ...((kind === "categories" || kind === "students") && active !== "all" ? { active } : {}),
       ...(kind === "students" && className !== "all" ? { className } : {}),
       ...(kind === "books" && categoryId ? { categoryId } : {}) });
     fetch(`/api/${kind}?${params}`, { signal: abort.signal })
@@ -58,7 +58,7 @@ export function RecordsLoader({ kind, initialData, categories }) {
   }, [kind, page, pageSize, debouncedSearch, active, className, categoryId, revision]);
 
   return <>
-     <RecordList kind={kind} data={data} page={page} pageSize={pageSize} search={search} active={active} className={className} setClassName={setClassName} categories={allCategories} categoryId={categoryId} setCategoryId={setCategoryId} setPage={setPage} setPageSize={setPageSize} setSearch={setSearch} setActive={setActive} onCreate={() => setEditor(null)} onEdit={setEditor} onImport={() => setImportOpen(true)} />
+     <RecordList kind={kind} data={data} page={page} pageSize={pageSize} search={search} active={active} className={className} setClassName={setClassName} categories={allCategories} categoryId={categoryId} setCategoryId={setCategoryId} setPage={setPage} setPageSize={setPageSize} setSearch={setSearch} setActive={setActive} onCreate={() => setEditor(null)} onEdit={setEditor} onImport={() => setImportOpen(true)} onRefreshed={() => setRevision((value) => value + 1)} onDeletedStudents={() => setRevision((value) => value + 1)} />
      {kind === "students" && <StudentImport open={importOpen} onClose={() => setImportOpen(false)} onComplete={() => setRevision((value) => value + 1)} />}
     {error && <p role="alert" className="mx-8 mb-4 rounded-lg bg-danger/10 p-3 text-danger">{error}<button onClick={() => setRevision((value) => value + 1)} className="ml-2 underline">Coba lagi</button></p>}
     {editor !== undefined && <RecordEditor kind={kind} record={editor} categories={allCategories} onClose={() => setEditor(undefined)} onSaved={() => { setEditor(undefined); setRevision((value) => value + 1); }} />}

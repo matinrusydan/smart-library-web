@@ -12,6 +12,7 @@
   --color-on-primary: var(--prt);
   --color-accent: var(--ac);
   --color-danger: var(--bad);
+  --color-danger-soft: var(--color-danger-soft);
   --color-success: var(--ok);
   --color-soft: var(--soft);
   --color-sidebar: var(--sb-bg);

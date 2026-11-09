@@ -45,7 +45,7 @@ export function Topbar({ user, title = "Smart Library" }) {
         {user && <button type="button" onClick={()=>setConfirmLogout(true)} aria-label="Keluar" title="Keluar" className="grid size-[40px] shrink-0 place-items-center rounded-md text-muted transition hover:bg-soft hover:text-text"><svg aria-hidden="true" viewBox="0 0 24 24" className="size-[20px]" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button>}
       </div>
       </div>
-      <Modal open={confirmLogout} onClose={()=>setConfirmLogout(false)} title="Keluar dari akun?"><p className="text-muted">Anda perlu masuk kembali untuk menggunakan portal.</p><div className="flex justify-end gap-3"><Button variant="ghost" onClick={()=>setConfirmLogout(false)}>Batal</Button><form action={logoutAction}><Button type="submit" variant="danger">Keluar</Button></form></div></Modal>
+      <Modal open={confirmLogout} onClose={()=>setConfirmLogout(false)} title="Keluar dari akun?"><p className="text-muted">Anda perlu masuk kembali untuk menggunakan portal.</p><div className="flex justify-end gap-3"><Button variant="ghost" onClick={()=>setConfirmLogout(false)}>Batal</Button><form action={logoutAction}><Button type="submit" variant="danger-solid">Keluar</Button></form></div></Modal>
     </header>
   );
 }

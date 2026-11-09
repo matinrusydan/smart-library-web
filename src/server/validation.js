@@ -71,3 +71,25 @@ function parseActive(value, label) {
 export function formObject(formData) {
   return Object.fromEntries(formData.entries());
 }
+
+export function bulkDeleteInput({ confirmation, ids, label = "Data" }) {
+  if (String(confirmation || "").trim() !== "HAPUS") throw new InputError("Ketik 'HAPUS' secara tepat untuk konfirmasi penghapusan");
+  const rawIds = Array.isArray(ids) ? ids : [ids].filter(Boolean);
+  if (!rawIds.length) throw new InputError(`Pilih setidaknya satu ${label.toLowerCase()} untuk dihapus`);
+  if (rawIds.length > 100) throw new InputError(`Maksimal 100 ${label.toLowerCase()} dapat dihapus sekaligus`);
+  return Array.from(new Set(rawIds.map((id) => positiveId(id, `ID ${label}`))));
+}
+
+export function studentBulkDeleteInput({ confirmation, ids }) {
+  return bulkDeleteInput({ confirmation, ids, label: "Siswa" });
+}
+
+export function bookBulkDeleteInput({ confirmation, ids }) {
+  return bulkDeleteInput({ confirmation, ids, label: "Buku" });
+}
+
+export function categoryBulkDeleteInput({ confirmation, ids }) {
+  return bulkDeleteInput({ confirmation, ids, label: "Kategori" });
+}
+
+

@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { requireUser } from "@/server/auth";
-import { availableAfterStockEdit, bookInput, categoryInput, formObject, positiveId, studentInput } from "@/server/validation";
+import { availableAfterStockEdit, bookBulkDeleteInput, bookInput, categoryBulkDeleteInput, categoryInput, formObject, positiveId, studentBulkDeleteInput, studentInput } from "@/server/validation";
 
 async function save(table, payload, id) {
   await requireUser(["superadmin", "petugas"]);
@@ -75,4 +75,119 @@ export async function setStudentActiveAction(formData) {
   await requireUser(["superadmin", "petugas"]);
   try { const id = positiveId(formData.get("id")); const active = formData.get("isActive"); if (!["true", "false"].includes(active)) return { error: "Status siswa tidak valid" }; const count = await db("students").where({ id }).update({ is_active: active === "true", updated_at: db.fn.now() }); return count ? { success: true } : { error: "Data tidak ditemukan" }; }
   catch (error) { if (error.name === "InputError") return { error: error.message }; throw error; }
+}
+
+export async function deleteBooksBulkAction(formData) {
+  const user = await requireUser(["superadmin", "petugas"]);
+  try {
+    const ids = bookBulkDeleteInput({
+      confirmation: formData.get("confirmation"),
+      ids: formData.getAll("ids"),
+    });
+
+    return await db.transaction(async (trx) => {
+      const activeItems = await trx("borrowing_items").whereIn("book_id", ids).count("id as count").first();
+      if (Number(activeItems?.count || 0) > 0) {
+        return { error: "Buku yang memiliki riwayat peminjaman tidak dapat dihapus karena integritas data transaksi." };
+      }
+
+      const deleted = await trx("books").whereIn("id", ids).delete().returning("id");
+      if (deleted.length > 0) {
+        await trx("audit_logs").insert({
+          user_id: user.id,
+          action: "books.bulk_delete",
+          entity_type: "books",
+          entity_id: `${deleted.length}_books`,
+          details: { count: deleted.length, requested: ids.length },
+        });
+      }
+      return { success: true, count: deleted.length };
+    });
+  } catch (error) {
+    if (error.name === "InputError") return { error: error.message };
+    if (error.code === "23503") {
+      return { error: "Buku yang dipilih terkait dengan data transaksi lain dan tidak dapat dihapus." };
+    }
+    throw error;
+  }
+}
+
+export async function deleteCategoriesBulkAction(formData) {
+  const user = await requireUser(["superadmin", "petugas"]);
+  try {
+    const ids = categoryBulkDeleteInput({
+      confirmation: formData.get("confirmation"),
+      ids: formData.getAll("ids"),
+    });
+
+    return await db.transaction(async (trx) => {
+      const linkedBooks = await trx("books").whereIn("category_id", ids).count("id as count").first();
+      if (Number(linkedBooks?.count || 0) > 0) {
+        return { error: "Kategori yang masih memiliki koleksi buku tidak dapat dihapus. Pindahkan atau hapus buku terkait terlebih dahulu." };
+      }
+
+      const deleted = await trx("categories").whereIn("id", ids).delete().returning("id");
+      if (deleted.length > 0) {
+        await trx("audit_logs").insert({
+          user_id: user.id,
+          action: "categories.bulk_delete",
+          entity_type: "categories",
+          entity_id: `${deleted.length}_categories`,
+          details: { count: deleted.length, requested: ids.length },
+        });
+      }
+      return { success: true, count: deleted.length };
+    });
+  } catch (error) {
+    if (error.name === "InputError") return { error: error.message };
+    if (error.code === "23503") {
+      return { error: "Kategori yang dipilih terkait dengan data lain dan tidak dapat dihapus." };
+    }
+    throw error;
+  }
+}
+
+export async function deleteStudentsBulkAction(formData) {
+  const user = await requireUser(["superadmin", "petugas"]);
+  try {
+    const ids = studentBulkDeleteInput({
+      confirmation: formData.get("confirmation"),
+      ids: formData.getAll("ids"),
+    });
+
+    return await db.transaction(async (trx) => {
+      const activeBorrowings = await trx("borrowings")
+        .whereIn("student_id", ids)
+        .whereIn("status", ["borrowed", "overdue"])
+        .count("id as count")
+        .first();
+      if (Number(activeBorrowings?.count || 0) > 0) {
+        return { error: "Sebagian siswa yang dipilih masih memiliki peminjaman aktif atau terlambat dan tidak dapat dihapus." };
+      }
+
+      const anyBorrowings = await trx("borrowings").whereIn("student_id", ids).count("id as count").first();
+      const anyFines = await trx("fines").whereIn("student_id", ids).count("id as count").first();
+      if (Number(anyBorrowings?.count || 0) > 0 || Number(anyFines?.count || 0) > 0) {
+        return { error: "Siswa yang memiliki riwayat peminjaman atau denda tidak dapat dihapus karena integritas data transaksi." };
+      }
+
+      const deleted = await trx("students").whereIn("id", ids).delete().returning("id");
+      if (deleted.length > 0) {
+        await trx("audit_logs").insert({
+          user_id: user.id,
+          action: "students.bulk_delete",
+          entity_type: "students",
+          entity_id: `${deleted.length}_students`,
+          details: { count: deleted.length, requested: ids.length },
+        });
+      }
+      return { success: true, count: deleted.length };
+    });
+  } catch (error) {
+    if (error.name === "InputError") return { error: error.message };
+    if (error.code === "23503") {
+      return { error: "Siswa yang dipilih terkait dengan data transaksi lain dan tidak dapat dihapus." };
+    }
+    throw error;
+  }
 }

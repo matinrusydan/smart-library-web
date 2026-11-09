@@ -58,3 +58,23 @@ test("phase 2 migration adds category active status and opaque session storage",
   assert(operations.some((op) => op[0] === "boolean" && op[1] === "categories" && op[2] === "is_active"));
   assert(operations.some((op) => op[0] === "index" && op[1][0] === "user_id"));
 });
+
+test("bulk delete validators enforce exact 'HAPUS' confirmation, positive numeric IDs, and deduplication", async () => {
+  const { bulkDeleteInput, bookBulkDeleteInput, categoryBulkDeleteInput, studentBulkDeleteInput, InputError } = await import("../src/server/validation.js");
+
+  // Rejects invalid confirmation case and string
+  assert.throws(() => bulkDeleteInput({ confirmation: "hapus", ids: ["1"] }), InputError);
+  assert.throws(() => bulkDeleteInput({ confirmation: "DELETE", ids: ["1"] }), InputError);
+  assert.throws(() => bulkDeleteInput({ confirmation: "", ids: ["1"] }), InputError);
+
+  // Rejects empty or invalid IDs
+  assert.throws(() => bulkDeleteInput({ confirmation: "HAPUS", ids: [] }), InputError);
+  assert.throws(() => bulkDeleteInput({ confirmation: "HAPUS", ids: ["not-a-number"] }), InputError);
+  assert.throws(() => bulkDeleteInput({ confirmation: "HAPUS", ids: ["-5"] }), InputError);
+
+  // Deduplicates and parses valid IDs
+  assert.deepEqual(bulkDeleteInput({ confirmation: "HAPUS", ids: ["1", "2", "1"] }), ["1", "2"]);
+  assert.deepEqual(bookBulkDeleteInput({ confirmation: "HAPUS", ids: ["10", "20"] }), ["10", "20"]);
+  assert.deepEqual(categoryBulkDeleteInput({ confirmation: "HAPUS", ids: ["3"] }), ["3"]);
+  assert.deepEqual(studentBulkDeleteInput({ confirmation: "HAPUS", ids: ["5", "7"] }), ["5", "7"]);
+});
