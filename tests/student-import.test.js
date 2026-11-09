@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import JSZip from "jszip";
 import { IMPORT_BATCH_SIZE, IMPORT_HEADERS, createStudentImportTemplate, normalizeImportRows, parseStudentWorkbook } from "../src/server/student-import-parser.js";
 import { InputError } from "../src/server/validation.js";
 
@@ -37,4 +38,16 @@ test("parser round-trips workbook and enforces required exact column headers", a
 test("batch size is bounded and row count is capped", () => {
   assert.equal(IMPORT_BATCH_SIZE, 100);
   assert.throws(() => normalizeImportRows(Array.from({ length: 5001 }, (_, i) => ({ rowNumber: i + 2, values: [String(i), "Name", "", "", ""] }))), InputError);
+});
+
+test("parser supports externally generated SpreadsheetML with prefixed XML namespaces and BOM", async () => {
+  const template = await createStudentImportTemplate();
+  const zip = await JSZip.loadAsync(template);
+  const path = "xl/workbook.xml";
+  const xml = await zip.file(path).async("string");
+  const modified = `\uFEFF${xml.replace("<workbook", '<x:workbook xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main"').replace("</workbook>", "</x:workbook>")}`;
+  zip.file(path, modified);
+  const parsed = await parseStudentWorkbook(await zip.generateAsync({ type: "nodebuffer" }));
+  assert.equal(parsed.length, 1);
+  assert.equal(parsed[0].student.student_number, "00123");
 });

@@ -1,5 +1,9 @@
 import ExcelJS from "exceljs";
+import JSZip from "jszip";
+import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import { InputError, studentInput } from "./validation.js";
+
+const SPREADSHEETML_NAMESPACE = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 
 export const IMPORT_MAX_BYTES = 2 * 1024 * 1024;
 export const IMPORT_MAX_ROWS = 5000;
@@ -31,10 +35,53 @@ function cellText(value) {
   return String(value);
 }
 
+async function normalizeSpreadsheetXmlNamespaces(buffer) {
+  const zip = await JSZip.loadAsync(buffer);
+  const parser = new DOMParser({
+    onError: (level, message) => {
+      if (level !== "warning") throw new InputError("XML workbook tidak valid");
+    },
+  });
+  const serializer = new XMLSerializer();
+
+  for (const [path, entry] of Object.entries(zip.files)) {
+    if (entry.dir || !path.endsWith(".xml")) continue;
+    const xml = (await entry.async("string")).replace(/^\uFEFF/, "");
+    const document = parser.parseFromString(xml, "application/xml");
+    const elements = [];
+    const visit = (node) => {
+      if (node.nodeType === 1) {
+        elements.push(node);
+        for (let child = node.firstChild; child; child = child.nextSibling) visit(child);
+      }
+    };
+    visit(document.documentElement);
+    for (const element of elements) {
+      if (element.namespaceURI !== SPREADSHEETML_NAMESPACE || !element.prefix) continue;
+      const replacement = document.createElementNS(SPREADSHEETML_NAMESPACE, element.localName);
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attribute = element.attributes.item(i);
+        if (attribute.name === `xmlns:${element.prefix}`) continue;
+        replacement.setAttributeNS(attribute.namespaceURI, attribute.name, attribute.value);
+      }
+      while (element.firstChild) replacement.appendChild(element.firstChild);
+      element.parentNode.replaceChild(replacement, element);
+    }
+    zip.file(path, serializer.serializeToString(document));
+  }
+
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
 export async function parseStudentWorkbook(buffer) {
   if (!Buffer.isBuffer(buffer) || buffer.length > IMPORT_MAX_BYTES) throw new InputError("File harus berukuran maksimal 2 MB");
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  try {
+    const normalized = await normalizeSpreadsheetXmlNamespaces(buffer);
+    await workbook.xlsx.load(normalized);
+  } catch {
+    throw new InputError("File XLSX tidak valid atau tidak didukung");
+  }
   const sheet = workbook.worksheets[0];
   if (!sheet) throw new InputError("Workbook tidak memiliki worksheet");
   const headers = IMPORT_HEADERS.map((_, i) => cellText(sheet.getRow(1).getCell(i + 1).value).trim());
